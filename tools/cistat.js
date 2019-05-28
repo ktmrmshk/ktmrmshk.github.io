@@ -1,3 +1,8 @@
+var start = (start === undefined) ? "": start; 
+var end = (end === undefined) ? "": end; 
+//startdate="2019-03-01";
+//enddate="2019-03-31";
+
 const importer = {
   url: (url) => {
     return new Promise((resolve, reject) => {
@@ -105,6 +110,10 @@ function getSumArray(array){
   return sum;
 }
 
+function getAllCountFromCTable(ctable){
+  //pass
+}
+
 //labels = ["Cipher", "AES128 SHA", "AES256 SHA"...]
 
 // rawframe = [[20180101, 20180102, ..], [96,324,...], ..]
@@ -115,19 +124,52 @@ function getSumArray(array){
 //cdata = {label: "SHA128", data: [1, 23, 31, ...], sum: 1234, per: 0.124 }
 
 //ctable = [{tlsver: "TLSv1.1", stat: [cdata1, cdata2, ...]}, sum: 1234, per: 0.43]
-//===> ctable = { "TLSv1.1" : {stat: [cdata1, cdata2, ..], sum:1234, per:0.4} }
+//===> ctable = { "TLSv1.1" : {stat: [cdata1, cdata2, ..], sum:1234, per:0.4}, "Date":["2019-03-01",..] }
+
+
+// startdate: "2019-03-15"
+// return: index to the correponding date, or 0 if not applicable
+function getDurationIndex(rawframe, startdate, enddate){
+
+  let _start_index;
+  if (startdate === undefined){
+    _start_index=0;
+  }
+  else{
+    _start_index = rawframe[0].indexOf(startdate);
+    if(_start_index == -1){
+      _start_index = 0;
+    }
+  }
+
+  let _end_index
+  if(enddate === undefined){
+    _end_index = rawframe[0].length - 1;
+  }
+  else{
+    _end_index = rawframe[0].indexOf(enddate);
+    if( _end_index == -1){
+      _end_index = rawframe[0].length - 1 - 1;
+    }
+  }
+  return {start_index: _start_index, end_index: _end_index};
+}
+
+
 
 //index: index of label: ex) index=1 => "AES128 SHA"
 //retur cdate 
-function genCData(rawframe, labels, index){
+function genCData(rawframe, labels, index, startdate, enddate){
   let cdata={};
+  let dur = getDurationIndex(rawframe, startdate, enddate);
   cdata.label = labels[index];
-  cdata.data = rawframe[index].slice(0, rawframe[index].length -1);
+  cdata.data = rawframe[index].slice(dur.start_index, dur.end_index + 1);
   
   //skip if "Cipher" label's col
   if(index != 0){
-    cdata.sum = rawframe[index][ rawframe[index].length - 1  ];
-    cdata.per = cdata.sum / getAllCount(rawframe);
+    cdata.sum = getSumArray(cdata.data);
+    //cdata.per = cdata.sum / getAllCount(rawframe);
+    cdata.per = 0.0;
   }
   return cdata;
 }
@@ -143,7 +185,7 @@ function getSumPer(cdata_list){
   return {sum: _sum, per: _per};
 }
 
-function genCTable(rawframe, labels, tlsinfo){
+function genCTable(rawframe, labels, tlsinfo, startdate, enddate){
   let ctable={};
   for(let v of tlsinfo){
     if(v.ver.includes("TLSv")){
@@ -155,12 +197,28 @@ function genCTable(rawframe, labels, tlsinfo){
     }
   }
 
+  // date label
+  ctable["Date"] = genCData(rawframe, labels, 0, startdate, enddate);
+
   //to make cdata per Cipher and append to ctable
   for(let i=0; i < labels.length; i++){
     let ver = getTLSver(tlsinfo, i);
     if(ver.includes('TLSv')){
-      let cdata = genCData(rawframe, labels, i);
+      let cdata = genCData(rawframe, labels, i, startdate, enddate);
       ctable[ver].stat.push(cdata);
+    }
+  }
+
+  //calc all count and per in each cdata
+  let allcount = 0;
+  for(let k in ctable){
+    for(i in ctable[k].stat){
+      allcount += ctable[k].stat[i].sum;
+    }
+  }
+  for(let k in ctable){
+    for(i in ctable[k].stat){
+      ctable[k].stat[i].per = ctable[k].stat[i].sum/allcount;;
     }
   }
 
@@ -236,6 +294,15 @@ function makeTable(ctable){
 
 }
 
+function makeDurationLabel(ctable){
+  let d = document.createElement('div');
+  //let innertxt = `<b>Date:</b> from ${ctable.Date.data[0]} to ${ctable.Date.data[ ctable.Date.data.length -1 ]} `;
+  //let txt = document.createTextNode(innertxt);
+  //d.appendChild(txt);
+  d.innerHTML=`<b>Date:</b> from ${ctable.Date.data[0]} to ${ctable.Date.data[ ctable.Date.data.length -1 ]} `;
+  return d;
+}
+
 
 importer.urls([
   'https://code.jquery.com/jquery-3.3.1.slim.min.js',
@@ -262,7 +329,9 @@ importer.urls([
   console.log(rawframe);
   _g.rawframe=rawframe;
 
-  let ctable = genCTable(rawframe, labels, tlsinfo);
+
+
+  let ctable = genCTable(rawframe, labels, tlsinfo, start, end);
   _g.ctable=ctable;
 
   $('body').append('<hr>');
@@ -273,6 +342,10 @@ importer.urls([
 
   let div_outer=document.createElement('div');
   div_outer.setAttribute('class', 'container');
+  
+  let dur=makeDurationLabel(ctable);
+  div_outer.appendChild(dur);
+    
   div_outer.appendChild(div_inner);
   $('body').append(div_outer);
 
