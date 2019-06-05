@@ -1,0 +1,9 @@
+wget https://www.misawa.co.jp/kodate/top/video/movie_nankyoku.mp4
+wget https://www.misawa.co.jp/kodate/syouhin/century_primore/video/century.mp4
+wget https://www.misawa.co.jp/kodate/kodawari/mgeo/movie/mgeo_movie.mp4
+wget https://www.misawa.co.jp/kodate/kodawari/design/movie/design_movie.mp4
+wget https://www.misawa.co.jp/kodate/kodawari/lcp/movie/lpc_movie.mp4
+wget https://www.misawa.co.jp/kodate/kodawari/kura/movie/kura_movie.mp4
+wget https://www.misawa.co.jp/hybrid/feature/movie/feature04.mp4
+wget https://www.misawa.co.jp/kodate/kodawari/energy/movie/energy_movie.mp4
+wget https://www.misawa.co.jp/kodate/kodawari/support/movie/support_movie.mp4
