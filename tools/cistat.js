@@ -316,16 +316,16 @@ importer.urls([
   loadstyle('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
 
   //get TLS version
-  let tlsinfo = parseTLSver('tbody tr:eq(1) th');
+  let tlsinfo = parseTLSver('#data > thead > tr th');
   console.log(tlsinfo);
   _g.tlsinfo = tlsinfo;
 
 
-  let labels = parseCipher('tbody tr:eq(2) th');
+  let labels = parseCipher('#data > tbody > tr:eq(0)  th');
   console.log(labels);
   _g.labels = labels;
 
-  let rawframe = parseRawFrame('tbody tr:gt(2)');
+  let rawframe = parseRawFrame('#data > tbody tr:gt(0)');
   console.log(rawframe);
   _g.rawframe=rawframe;
 
