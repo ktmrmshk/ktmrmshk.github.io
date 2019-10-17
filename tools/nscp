@@ -1,0 +1,5 @@
+#!/bin/bash
+curl -T "$1" -u 'USERNAME:PASSWORD' "ftp://sdjapan.upload.akamai.com/340149/training/$2/" --ftp-create-dirs
+BASE=$(basename "$1")
+echo "URL: https://docstraining.akamaized.net/$2/$(basename $BASE)"
+
