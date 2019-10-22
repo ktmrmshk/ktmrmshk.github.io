@@ -1,3 +1,6 @@
+def SCRIPT(url, attr={}):
+    print('<script src="{}"></script>'.format(url))
+
 def H1(string):
     print('<h1>{}</h1>'.format(string))
 
@@ -29,6 +32,8 @@ def do_export():
     for i in range(200):
         imgfile='img/{:04d}_low.jpg'.format(i)
         IMG(imgfile, {'width': 200})
+
+    SCRIPT('0000.js')
 
     print('</body>')
     print('</html>')
