@@ -1,3 +1,6 @@
+def CSS(url):
+    print('<link rel="stylesheet" type="text/css" href="{}">'.format(url))
+
 def SCRIPT(url, attr={}):
     print('<script src="{}"></script>'.format(url))
 
@@ -35,6 +38,10 @@ def do_export():
     for i in range(200):
         imgfile='img/{:04d}_low.jpg'.format(i)
         IMG(imgfile, {'width': 200})
+
+    for i in range(20):
+        cssfile='css/{:04d}.css'.format(i)
+        CSS(cssfile)
 
 
     print('</body>')
