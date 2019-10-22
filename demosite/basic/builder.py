@@ -26,6 +26,9 @@ def do_export():
 
     ### Body ###
     print('<body>')
+    
+    for i in range(20):
+        SCRIPT('js/{:04d}.js'.format(i))
 
     H1('This is test HTML')
     
@@ -33,8 +36,6 @@ def do_export():
         imgfile='img/{:04d}_low.jpg'.format(i)
         IMG(imgfile, {'width': 200})
 
-    for i in range(20):
-        SCRIPT('js/{:04d}.js'.format(i))
 
     print('</body>')
     print('</html>')
