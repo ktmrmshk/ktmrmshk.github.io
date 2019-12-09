@@ -51,6 +51,14 @@
       return ret;
     }
 
+    // input : "Host%3a%20dsa.ktmrmshk.xyz%0d%0aUser-Agent%3a%20curl%2f7.54.0%0d%0aAccept%3a%20*%2f*%0d%0a"
+    // output: ["Host: dsa.ktmrmshk.xyz", "User-Agent: curl/7.54.0", "Accept: */*"]
+    function parseHeader(header_string){
+      let headers = decodeURIComponent(header_string).split("\r\n");
+      headers.pop();
+      return headers;
+    }
+
     function parseAkSiem(siem_json){
       if("attackData" in siem_json){
         adata = siem_json["attackData"];
@@ -60,7 +68,17 @@
           }
         }
       }
+
+      if("httpMessage" in siem_json){
+        adata = siem_json["httpMessage"];
+        for(var k in adata){
+          if( k.endsWith("Headers")){
+            adata[k] = parseHeader(adata[k]);
+          }
+        }
+      }
     }
+
 
     function showDecText(){
       text = $("#exampleFormControlTextarea1").val();
